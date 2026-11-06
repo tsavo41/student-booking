@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AttachFlow – Student Hospital Attachment Booking System</title>
+<style>
+:root{--navy:#10243e;--blue:#2563eb;--teal:#0f9f8f;--bg:#f4f7fb;--ink:#172b4d;--muted:#66758a;--line:#e3eaf2;--white:#fff;--red:#dc2626;--amber:#d97706}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(120deg,#10243e,#1e4975);color:white;padding:20px 5%;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{display:flex;gap:12px;align-items:center}.logo{width:42px;height:42px;border-radius:13px;background:#fff;color:#1d4ed8;display:grid;place-items:center;font-weight:900;font-size:22px}.brand h1{margin:0;font-size:22px}.brand p{margin:4px 0 0;color:#c8d9ec;font-size:12px}
+.top-actions{display:flex;align-items:center;gap:10px}.role-select{padding:10px;border-radius:9px;border:1px solid #dbe5ef;background:white}
+main{max-width:1200px;margin:26px auto;padding:0 20px}.welcome{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:20px}.welcome h2{margin:0 0 7px;font-size:26px}.welcome p{margin:0;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0}.stat,.panel,.hospital{background:white;border:1px solid var(--line);border-radius:15px;box-shadow:0 3px 14px #10243e08}.stat{padding:18px}.stat small{color:var(--muted)}.stat strong{display:block;font-size:27px;margin-top:8px}
+.panel{padding:20px;margin-bottom:20px}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:15px}.panel h3{margin:0}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap}.toolbar input,.toolbar select,.field input,.field select,.field textarea{padding:11px 12px;border:1px solid #d6e0ea;border-radius:9px;background:#fff;font:inherit;min-width:150px}
+button{border:0;border-radius:9px;padding:10px 14px;font:inherit;font-weight:600;cursor:pointer}.primary{background:var(--blue);color:white}.secondary{background:#eaf1ff;color:#1d4ed8}.danger{background:#fee2e2;color:#991b1b}.muted-btn{background:#eef2f7;color:#334155}.success{background:#dcfce7;color:#166534}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.hospital{padding:18px;position:relative}.hospital h4{margin:0 0 7px;font-size:17px}.hospital .location{color:var(--muted);font-size:13px;margin-bottom:13px}.meta{display:flex;justify-content:space-between;font-size:13px;margin:10px 0;color:#475569}.progress{height:8px;background:#e9eef5;border-radius:20px;overflow:hidden}.progress span{display:block;height:100%;background:var(--teal);border-radius:20px}.progress span.full{background:var(--red)}
+.badge{display:inline-block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;padding:5px 8px;border-radius:20px}.open{background:#dcfce7;color:#166534}.full{background:#fee2e2;color:#991b1b}.closed{background:#e2e8f0;color:#475569}.hospital .actions{display:flex;gap:8px;margin-top:15px;flex-wrap:wrap}.hospital button{flex:1}.locked-note{font-size:12px;color:#b91c1c;margin-top:8px}
+table{width:100%;border-collapse:collapse;min-width:600px}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line);font-size:14px}th{color:#64748b;background:#f8fafc;font-size:12px;text-transform:uppercase}.table-wrap{overflow:auto}
+.notice{padding:13px 15px;border-radius:10px;background:#eff6ff;color:#1e40af;margin:15px 0;font-size:14px}.notice.warning{background:#fff7ed;color:#9a3412}.hidden{display:none!important}.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}.field label{font-size:13px;font-weight:700;color:#475569}.field input,.field select{width:100%}
+#toast{position:fixed;right:20px;bottom:20px;background:#10243e;color:white;padding:13px 18px;border-radius:10px;box-shadow:0 8px 25px #0002;display:none;z-index:10}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}main{padding:0 12px}.welcome h2{font-size:22px}}
+</style>
+<style>
+:root{--navy:#132d4f;--blue:#2764d8;--teal:#118779;--bg:#f4f7fb;--ink:#172b4d;--muted:#66758a;--line:#e4eaf2}
+body{font-family:Inter,"Segoe UI",Arial,sans-serif;background:radial-gradient(ellipse at 12% 0%,#e8f0ff 0,transparent 34%),var(--bg);color:var(--ink);line-height:1.5}
+header{padding:17px max(5%,calc((100% - 1160px)/2));background:linear-gradient(115deg,#10243e,#194b7e);box-shadow:0 8px 26px #10243e18}
+.brand{gap:13px}.logo{border-radius:14px;box-shadow:0 4px 12px #071a3040}.brand h1{letter-spacing:-.4px}.brand p{letter-spacing:.1px}
+.top-actions{font-size:13px;font-weight:600}.role-select{font:inherit;padding:9px 34px 9px 12px;border-color:#ffffff60;cursor:pointer}
+main{max-width:1200px;margin:34px auto;padding:0 24px}
+.welcome{align-items:center;margin-bottom:24px}.welcome h2{font-size:clamp(23px,3vw,30px);letter-spacing:-.7px}.welcome p{font-size:14px}.welcome>div:last-child{display:flex;gap:8px}
+.stats{gap:16px;margin:24px 0}.stat{padding:19px 20px;position:relative;overflow:hidden;transition:transform .18s ease,box-shadow .18s ease}.stat:hover{transform:translateY(-2px);box-shadow:0 8px 24px #10243e12}.stat small{font-size:12px;font-weight:600;letter-spacing:.2px}.stat strong{font-size:29px;letter-spacing:-.6px}
+.panel{padding:22px;margin-bottom:20px}.panel h3{font-size:17px;letter-spacing:-.2px}.panel-head{margin-bottom:18px}
+.notice{border:1px solid #dbeafe;line-height:1.55}.notice.warning{border-color:#fed7aa}
+.toolbar{align-items:center}.toolbar input,.toolbar select,.field input,.field select{font:inherit;font-size:13px;min-height:42px}.toolbar input{min-width:230px}.toolbar select{min-width:155px}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid #93c5fd;outline-offset:2px}
+button{transition:filter .15s ease,transform .15s ease;min-height:40px}button:hover:not(:disabled){filter:brightness(.96);transform:translateY(-1px)}button:disabled{cursor:not-allowed;opacity:.72}
+.primary{background:linear-gradient(135deg,#2c6de0,#2359c7);box-shadow:0 3px 8px #2563eb20}.secondary{background:#edf3ff}
+.grid{gap:16px}.hospital{padding:19px;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.hospital:hover{transform:translateY(-3px);border-color:#c8d8ef;box-shadow:0 10px 24px #10243e12}.hospital h4{letter-spacing:-.2px;line-height:1.35}.hospital .location{min-height:20px;line-height:1.5}.meta{font-size:12px}.progress{height:7px}.hospital .actions{margin-top:16px}.hospital .actions button{min-height:42px}
+.badge{letter-spacing:.35px}.table-wrap{border:1px solid var(--line);border-radius:10px}table{min-width:720px}th,td{padding:13px 14px}th{letter-spacing:.35px}tbody tr:last-child td{border-bottom:0}tbody tr:hover{background:#f8fafc}
+.field label{font-size:12px}.hidden{display:none!important}
+#toast{max-width:min(420px,calc(100vw - 32px));line-height:1.45;box-shadow:0 10px 30px #10243e30}
+dialog{width:min(440px,calc(100vw - 32px));padding:24px;border:1px solid var(--line);border-radius:16px;color:var(--ink);box-shadow:0 18px 60px #10243e35}
+dialog::backdrop{background:#10243e80}
+.password-control{display:flex;gap:8px}.password-control input{flex:1;min-width:0}.password-control button{min-width:72px}
+.login-brand{margin:0 0 20px;color:var(--ink)}.login-brand .logo{background:#2563eb;color:#fff}.login-brand p{color:var(--muted)}
+.auth-links{display:flex;justify-content:space-between;gap:12px;margin:18px 0 0;font-size:13px}.auth-links a{color:#1d4ed8;font-weight:600}
+.form-actions,.row-actions{display:flex;gap:8px;flex-wrap:wrap}.row-actions button{min-height:36px;padding:8px 10px;font-size:12px}
+.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.booking-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 16px}
+.booking-form .wide,.records-filters .wide{grid-column:1/-1}
+.records-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 12px;width:100%}
+.records-filters input,.records-filters select{width:100%;min-width:0}
+.error-message{padding:10px 12px;border-radius:9px;background:#fee2e2;color:#991b1b;font-size:13px;margin:0 0 14px}
+.success-message{padding:14px 16px;border:1px solid #bbf7d0;border-radius:10px;background:#f0fdf4;color:#166534}
+.student-records{margin-top:22px}
+.admin-shell{display:grid;grid-template-columns:225px minmax(0,1fr);gap:20px;align-items:start}
+.admin-nav{display:flex;flex-direction:column;gap:7px;position:sticky;top:14px;padding:12px;background:#fff;border:1px solid var(--line);border-radius:14px}
+.admin-nav button{width:100%;text-align:left;background:transparent;color:#334155}
+.admin-nav button.active{background:#173d65;color:#fff}
+.admin-nav.collapsed{display:none}
+.admin-content{min-width:0}
+.dashboard-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:0 0 18px}
+.dashboard-metrics .stat{min-height:96px}
+.chart-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.chart-panel svg{width:100%;height:auto;min-height:210px}
+.chart-panel .chart-label{font-size:11px;fill:#475569}
+.chart-panel .chart-value{font-size:11px;fill:#172b4d;font-weight:700}
+.notification-count{background:#dc2626;color:white;border-radius:20px;padding:2px 7px;font-size:11px}
+.module-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.module-toolbar input,.module-toolbar select{min-height:40px;padding:8px 10px;border:1px solid #d6e0ea;border-radius:9px;font:inherit}
+.sort-button{padding:0;min-height:auto;background:transparent;color:inherit;font-size:inherit;text-transform:inherit}
+.admin-layout-heading{display:flex;align-items:center;gap:10px}
+.sidebar-toggle{display:none}
+.subnav{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.subnav button{background:#e8eef7;color:#334155}
+.subnav button.active{background:#173d65;color:#fff}
+.notification-list{display:grid;gap:10px;padding:0;list-style:none}
+.notification-item{padding:12px;border:1px solid var(--line);border-radius:10px;background:#f8fafc}
+.notification-item small{display:block;color:var(--muted);margin-top:4px}
+.muted{color:var(--muted)}
+.status-active{color:#166534;background:#dcfce7}
+.status-suspended{color:#991b1b;background:#fee2e2}
+.print-only{display:none}
+.loading{padding:24px;text-align:center;color:var(--muted)}
+.report-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.export-actions{display:flex;gap:8px;flex-wrap:wrap}
+.lookup-form{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.lookup-form .field{flex:1;min-width:220px}
+.lookup-result{margin-top:14px}
+@media(max-width:900px){.admin-shell{grid-template-columns:185px minmax(0,1fr);gap:14px}.dashboard-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){header{padding:15px 18px}.top-actions{width:100%;justify-content:space-between}main{margin:24px auto;padding:0 16px}.panel{padding:17px}.panel-head{align-items:flex-start}.toolbar{width:100%}.toolbar input,.toolbar select{flex:1;min-width:0}.welcome>div:last-child{width:100%}.admin-shell{grid-template-columns:1fr}.admin-nav{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding:8px}.admin-nav button{text-align:center;padding:9px 6px;font-size:12px}.chart-grid{grid-template-columns:1fr}.sidebar-toggle{display:inline-flex}}
+@media(max-width:420px){.stats{gap:10px}.stat{padding:14px}.stat strong{font-size:24px}.hospital{padding:16px}.toolbar{flex-direction:column;align-items:stretch}.toolbar input,.toolbar select{width:100%}}
+@media(max-width:700px){.records-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.report-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.booking-form,.form-grid,.records-filters,.report-grid{grid-template-columns:1fr}.booking-form .wide,.records-filters .wide{grid-column:auto}.form-actions button,.lookup-form button{flex:1}}
+@media print{body{background:#fff}.admin-nav,.top-actions,.no-print,button{display:none!important}.admin-shell{display:block}main{max-width:none;margin:0;padding:0}.panel,.stat{box-shadow:none;break-inside:avoid}.hidden{display:none!important}.print-only{display:block}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand"><div class="logo">A</div><div><h1>AttachFlow</h1><p>Student Hospital Attachment Booking System</p></div></div>
+ <div class="top-actions"><span id="roleLabel">Student Portal</span><button id="notificationButton" class="secondary hidden" onclick="showNotifications()" aria-label="Notifications">Notifications <span id="notificationCount" class="notification-count hidden">0</span></button><button id="adminLoginButton" class="secondary" onclick="showAdminLogin()">Administrator sign in</button><button id="adminLogoutButton" class="secondary hidden" onclick="logoutAdmin()">Sign out</button></div>
+</header>
+<main>
+ <div class="welcome">
+  <div><h2 id="pageTitle">Find your clinical attachment</h2><p id="pageSubtitle">Choose from approved hospitals. Availability updates automatically.</p></div>
+ </div>
+ <section id="studentView">
+  <div class="notice"><b>Booking rule:</b> Once a hospital reaches capacity, it is automatically locked for student booking. Only an administrator can reopen it or change its capacity.</div>
+  <div class="panel">
+   <div class="panel-head"><h3>Available hospitals</h3><div class="toolbar"><input id="search" type="search" aria-label="Search hospitals" placeholder="Search hospital or county..."><select id="countyFilter" aria-label="Filter by county"><option value="">All counties</option></select></div></div>
+   <div class="grid" id="hospitalGrid"><div class="loading">Loading hospitals...</div></div>
+  </div>
+  <div class="panel hidden" id="bookingPanel">
+   <div class="panel-head"><h3>Student booking form</h3></div>
+   <form id="studentBookingForm" class="booking-form" onsubmit="submitBooking(event)">
+    <div class="field"><label for="studentFullName">Full Name</label><input id="studentFullName" name="fullName" autocomplete="name" required maxlength="120" placeholder="Enter your full official name"></div>
+    <div class="field"><label for="studentAdmission">Admission Number</label><input id="studentAdmission" name="admissionNumber" autocomplete="off" required maxlength="40" placeholder="Enter your KMTC admission number"></div>
+    <div class="field"><label>Selected hospital</label><p id="selectedHospital" class="selected-hospital-name" aria-live="polite"></p></div>
+    <p id="bookingFormMessage" class="error-message wide hidden" role="alert"></p>
+    <div class="form-actions wide"><button class="primary" type="submit">Submit booking</button><button class="muted-btn" type="button" onclick="closeBookingForm()">Cancel</button></div>
+   </form>
+  </div>
+  <div class="panel"><div class="panel-head"><h3>Check my booking</h3></div><form class="lookup-form" onsubmit="lookupBooking(event)"><div class="field"><label for="lookupAdmission">Admission Number</label><input id="lookupAdmission" required maxlength="40" autocomplete="off" placeholder="Enter your admission number"></div><button class="secondary" type="submit">Check booking</button></form><div id="lookupResult" class="lookup-result hidden" aria-live="polite"></div><div id="myBooking" class="hidden"></div></div>
+ </section>
+
+ <section id="adminView" class="hidden">
+  <div class="notice warning admin-layout-heading"><button class="muted-btn sidebar-toggle no-print" type="button" onclick="toggleAdminSidebar()" aria-controls="adminNavigation" aria-expanded="true">Toggle navigation</button><span><b>Administrator access:</b> Signed in as <b id="adminUsername"></b>. Student admission numbers and booking records are restricted to this authenticated portal.</span></div>
+  <div class="admin-shell">
+  <nav class="admin-nav" aria-label="Administrator sections" id="adminNavigation">
+   <button class="active" data-admin-tab="overview" onclick="selectAdminTab('overview')">Dashboard overview</button>
+   <button data-admin-tab="hospitals" onclick="selectAdminTab('hospitals')">Hospital management</button>
+   <button data-admin-tab="bookings" onclick="selectAdminTab('bookings')">Student management</button>
+   <button data-admin-tab="booking-history" onclick="selectAdminTab('booking-history')">Booking management</button>
+   <button data-admin-tab="reports" onclick="selectAdminTab('reports')">Reports and analytics</button>
+   <button data-admin-tab="administrators" data-super-admin-only onclick="selectAdminTab('administrators')">Administrator management</button>
+   <button data-admin-tab="activity" onclick="selectAdminTab('activity')">Activity logs</button>
+   <button data-admin-tab="settings" onclick="selectAdminTab('settings')">System settings</button>
+  </nav>
+  <div class="admin-content">
+  <section data-admin-section="overview">
+   <div class="dashboard-metrics">
+    <div class="stat"><small>Total hospitals</small><strong id="overviewHospitals">—</strong></div><div class="stat"><small>Confirmed bookings</small><strong id="overviewBookings">—</strong></div><div class="stat"><small>Total students</small><strong id="overviewStudents">—</strong></div><div class="stat"><small>Available slots</small><strong id="overviewSlots">—</strong></div>
+    <div class="stat"><small>Fully booked</small><strong id="overviewFull">—</strong></div><div class="stat"><small>Available hospitals</small><strong id="overviewAvailableHospitals">—</strong></div><div class="stat"><small>Locked hospitals</small><strong id="overviewLocked">—</strong></div><div class="stat"><small>Cancelled bookings</small><strong id="overviewCancelled">—</strong></div>
+   </div>
+   <div class="chart-grid">
+    <div class="panel chart-panel"><div class="panel-head"><h3>Hospital occupancy</h3></div><div id="occupancyChart" aria-label="Hospital occupancy chart"></div></div>
+    <div class="panel chart-panel"><div class="panel-head"><h3>Student allocations and available capacity</h3></div><div id="allocationChart" aria-label="Student allocations and available capacity chart"></div></div>
+   </div>
+   <div class="panel"><div class="panel-head"><h3>Hospital allocation overview</h3></div><div class="table-wrap"><table><thead><tr><th>Hospital</th><th>Location</th><th>Bookings</th><th>Capacity</th><th>Available slots</th><th>Occupancy</th><th>Status</th></tr></thead><tbody id="overviewHospitalTable"></tbody></table></div></div>
+  </section>
+  <section data-admin-section="hospitals" class="hidden">
+  <div class="panel">
+   <div class="panel-head"><h3>Hospital management</h3><button class="primary write-only" onclick="showAddHospital()">+ Add hospital</button></div>
+   <div class="table-wrap"><table><thead><tr><th>Hospital</th><th>Location</th><th>Capacity</th><th>Booked slots</th><th>Available slots</th><th>Occupancy</th><th>Status</th><th>Students</th><th>Admin actions</th></tr></thead><tbody id="adminTable"></tbody></table></div>
+  </div>
+  <div class="panel hidden" id="addPanel"><h3 id="hospitalFormTitle">Add hospital</h3><form id="hospitalForm" class="form-grid">
+   <div class="field"><label for="newName">Hospital name</label><input id="newName" placeholder="Hospital name"></div><div class="field"><label for="newCounty">County</label><input id="newCounty" placeholder="County"></div>
+   <div class="field"><label for="newCapacity">Capacity (slots)</label><input id="newCapacity" type="number" min="1" value="5"></div><div class="field"><label for="newDepartment">Department</label><input id="newDepartment" value="Occupational Therapy"></div>
+   <div class="form-actions wide"><button class="primary" id="saveHospitalButton" type="submit">Save hospital</button><button class="muted-btn" type="button" onclick="hideAddHospital()">Cancel</button></div>
+  </form></div>
+  </section>
+  <section data-admin-section="bookings" class="hidden"><div class="panel student-records" id="studentRecordsPanel">
+   <div class="panel-head"><div><h3>Student management</h3><p style="margin:5px 0 0;color:var(--muted);font-size:13px">Search allocations, inspect booking details, and manage active bookings.</p></div><div class="module-toolbar"><button class="secondary" onclick="exportReport('xlsx')">Export to Excel</button><button class="secondary" onclick="window.print()">Print</button></div></div>
+   <div class="records-filters">
+    <div class="field"><label for="recordSearch">Search name or admission number</label><input id="recordSearch" type="search" placeholder="Search student records..." oninput="renderAdminRecords()"></div>
+    <div class="field"><label for="recordHospitalFilter">Hospital</label><select id="recordHospitalFilter" onchange="renderAdminRecords()"><option value="">All hospitals</option></select></div>
+    <div class="field"><label for="recordCourseFilter">Course</label><select id="recordCourseFilter" disabled><option>OCCUPATIONAL THERAPY</option></select></div>
+    <div class="field"><label for="recordCampusFilter">Campus</label><select id="recordCampusFilter" disabled><option>KMTC NAIROBI CAMPUS</option></select></div>
+    <div class="field"><label for="recordYearFilter">Year of Study</label><select id="recordYearFilter" disabled><option>3.2</option></select></div>
+   </div>
+   <div class="table-wrap" id="allRecordsTableWrap"><table><thead><tr><th>No.</th><th><button class="sort-button" data-sort-bookings="fullName">Full Name ↕</button></th><th><button class="sort-button" data-sort-bookings="admissionNumber">Admission Number ↕</button></th><th><button class="sort-button" data-sort-bookings="hospital">Allocated hospital ↕</button></th><th><button class="sort-button" data-sort-bookings="status">Booking status ↕</button></th><th><button class="sort-button" data-sort-bookings="createdAt">Booking date ↕</button></th><th>Actions</th></tr></thead><tbody id="studentRecordsTable"></tbody></table></div>
+   <div class="hidden" id="hospitalStudentsView"><h4 id="hospitalStudentsTitle">Hospital Student Records <button class="muted-btn" onclick="clearHospitalStudentsView()">Show all records</button></h4><div class="table-wrap"><table><thead><tr><th>No.</th><th>Full Name</th><th>Admission Number</th><th>Allocated hospital</th><th>Booking status</th><th>Booking date</th><th>Actions</th></tr></thead><tbody id="hospitalStudentsTable"></tbody></table></div></div>
+  </div></section>
+  <section data-admin-section="booking-history" class="hidden"><div class="panel"><div class="panel-head"><div><h3>Booking management</h3><p class="muted">Confirmed allocations and cancelled booking history.</p></div><div class="module-toolbar"><button class="secondary" onclick="selectAdminTab('bookings')">Confirmed bookings</button><button class="secondary" onclick="loadBookingHistory()">Cancelled history</button><button class="secondary" onclick="window.print()">Print</button></div></div><div id="bookingHistoryContent"><p class="loading">Select a booking view.</p></div></div></section>
+  <section data-admin-section="reports" class="hidden"><div class="panel"><div class="panel-head"><h3>Reports and analytics</h3><div class="export-actions"><button class="secondary" onclick="exportReport('pdf')">Export PDF</button><button class="secondary" onclick="exportReport('xlsx')">Export Excel</button><button class="secondary" onclick="exportReport('csv')">Export CSV</button></div></div><p>Download student allocation lists and current capacity reports.</p><div class="table-wrap"><table><thead><tr><th>Hospital</th><th>Bookings</th><th>Capacity</th><th>Available</th><th>Status</th></tr></thead><tbody id="reportsHospitalTable"></tbody></table></div></div></section>
+  <section data-admin-section="administrators" class="hidden" data-super-admin-only><div class="panel"><div class="panel-head"><div><h3>Administrator management</h3><p class="muted">Invite administrators by email. Only a Super Administrator can authorize account creation and assign roles.</p></div><button class="primary" onclick="showAdministratorForm()">Invite administrator</button></div><div id="administratorFormPanel" class="hidden"><form id="administratorForm" class="form-grid"><div class="field"><label for="newAdminName">Full name</label><input id="newAdminName" required maxlength="120"></div><div class="field"><label for="newAdminUsername">Username</label><input id="newAdminUsername" required maxlength="80"></div><div class="field"><label for="newAdminEmail">Email</label><input id="newAdminEmail" type="email" required maxlength="254"></div><div class="field"><label for="newAdminRole">Role</label><select id="newAdminRole"><option value="admin">Administrator</option><option value="read_only_admin">Read-only Administrator</option><option value="super_admin">Super Administrator</option></select></div><p class="muted wide">The invitee sets their own password after opening the one-time invitation link. Invitations expire after 48 hours.</p><div class="form-actions wide"><button class="primary" type="submit">Send invitation</button><button class="muted-btn" type="button" onclick="hideAdministratorForm()">Cancel</button></div></form></div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody id="administratorTable"></tbody></table></div></div></section>
+  <section data-admin-section="activity" class="hidden"><div class="panel"><div class="panel-head"><h3>Activity logs</h3></div><div class="table-wrap"><table><thead><tr><th>Time</th><th>Administrator</th><th>Action</th><th>Details</th></tr></thead><tbody id="logTable"></tbody></table></div></div></section>
+  <section data-admin-section="settings" class="hidden"><div class="panel"><div class="panel-head"><h3>System settings and profile</h3></div><div id="systemSettings" class="loading"></div><form id="profileForm" class="form-grid write-only"><div class="field"><label for="profileFullName">Full name</label><input id="profileFullName" required maxlength="120"></div><div class="field"><label for="profileUsername">Username</label><input id="profileUsername" required maxlength="80"></div><div class="field"><label for="profileEmail">Email</label><input id="profileEmail" type="email" required maxlength="254"></div><div class="form-actions wide"><button class="primary" type="submit">Save profile</button></div></form><hr><h4>Change sign-in credentials</h4><p class="muted">Confirm your current password, then enter and confirm the new password. You will be signed out on all devices.</p><form id="passwordForm" class="form-grid write-only"><div class="field"><label for="currentPassword">Current password</label><input id="currentPassword" type="password" required autocomplete="current-password"></div><div class="field"><label for="newPassword">New password (at least 12 characters)</label><input id="newPassword" type="password" required minlength="12" maxlength="72" autocomplete="new-password"></div><div class="field"><label for="confirmNewPassword">Confirm new password</label><input id="confirmNewPassword" type="password" required minlength="12" maxlength="72" autocomplete="new-password"></div><div class="form-actions wide"><button class="primary" type="submit">Update password</button></div></form><div class="form-actions" data-super-admin-only><button class="secondary" id="backupButton" onclick="downloadDatabaseBackup()">Download database backup</button></div></section>
+  </div>
+ </section>
+</main>
+<div id="toast" role="status" aria-live="polite"></div>
+<dialog id="notificationDialog" aria-labelledby="notificationTitle"><div class="panel-head"><h3 id="notificationTitle">Notifications</h3><button class="muted-btn" onclick="document.getElementById('notificationDialog').close()">Close</button></div><ul id="notificationList" class="notification-list"></ul></dialog>
+<dialog id="bookingDetailsDialog" aria-labelledby="bookingDetailsTitle"><h3 id="bookingDetailsTitle">Booking details</h3><div id="bookingDetailsContent"></div><div class="form-actions"><button class="muted-btn" onclick="document.getElementById('bookingDetailsDialog').close()">Close</button></div></dialog>
+<dialog id="deleteDialog" aria-labelledby="deleteDialogTitle"><h3 id="deleteDialogTitle">Confirm deletion</h3><p id="deleteDialogMessage"></p><div class="form-actions"><button class="danger" id="deleteDialogConfirmButton" onclick="confirmDelete()">Delete</button><button class="muted-btn" onclick="closeDeleteDialog()">Cancel</button></div></dialog>
+<dialog id="adminLoginDialog" aria-labelledby="adminLoginTitle"><div class="brand login-brand"><div class="logo">A</div><div><h1>AttachFlow</h1><p>Student Hospital Attachment Booking System</p></div></div><h3 id="adminLoginTitle">Administrator Sign In</h3><form id="adminLoginForm"><div class="field"><label for="adminUsernameInput">Username</label><input id="adminUsernameInput" autocomplete="username" required maxlength="80"></div><div class="field"><label for="adminPasswordInput">Password</label><div class="password-control"><input id="adminPasswordInput" type="password" autocomplete="current-password" required maxlength="200"><button class="muted-btn" id="toggleAdminPassword" type="button" aria-pressed="false">Show</button></div></div><p id="adminLoginError" class="error-message hidden" role="alert"></p><div class="form-actions"><button class="primary" type="submit">Sign In</button></div></form><p class="auth-links"><a href="#create-account" id="openAdminRegistration">Create Account</a><a href="#forgot-password" id="openAdminRecovery">Forgot Password?</a></p></dialog>
+<dialog id="adminRegistrationDialog" aria-labelledby="registrationTitle"><h3 id="registrationTitle">Create Administrator Account</h3><p id="registrationInviteNotice" class="notice warning hidden">Registration is invitation-only. Open the link sent by a Super Administrator to continue.</p><form id="adminRegistrationForm" class="hidden"><input type="hidden" id="registrationInviteToken"><div class="field"><label for="registrationFullName">Full Name</label><input id="registrationFullName" autocomplete="name" required maxlength="120"></div><div class="field"><label for="registrationUsername">Username</label><input id="registrationUsername" autocomplete="username" required minlength="3" maxlength="80" pattern="[A-Za-z0-9._-]{3,80}"></div><div class="field"><label for="registrationEmail">Email Address</label><input id="registrationEmail" type="email" autocomplete="email" required maxlength="254"></div><div class="field"><label for="registrationPassword">Password</label><input id="registrationPassword" type="password" autocomplete="new-password" required minlength="12" maxlength="72"></div><div class="field"><label for="registrationConfirmPassword">Confirm Password</label><input id="registrationConfirmPassword" type="password" autocomplete="new-password" required minlength="12" maxlength="72"></div><p id="registrationError" class="error-message hidden" role="alert"></p><button class="primary" type="submit">Create Account</button></form></dialog>
+<dialog id="adminRecoveryDialog" aria-labelledby="recoveryTitle"><h3 id="recoveryTitle">Reset Administrator Password</h3><p>Enter the registered administrator email. If an active account matches, we’ll send a one-time recovery link.</p><form id="adminRecoveryForm"><div class="field"><label for="recoveryEmail">Registered administrator email</label><input id="recoveryEmail" type="email" autocomplete="email" required maxlength="254" value="juki13305@gmail.com"></div><p id="recoveryMessage" class="notice hidden" role="status"></p><button class="primary" type="submit">Send Recovery Link</button></form></dialog>
+<dialog id="adminResetDialog" aria-labelledby="resetTitle"><h3 id="resetTitle">Choose a New Administrator Password</h3><form id="adminResetForm"><input type="hidden" id="resetToken"><div class="field"><label for="resetPassword">New password</label><input id="resetPassword" type="password" autocomplete="new-password" required minlength="12" maxlength="72"></div><div class="field"><label for="resetConfirmPassword">Confirm new password</label><input id="resetConfirmPassword" type="password" autocomplete="new-password" required minlength="12" maxlength="72"></div><p id="resetError" class="error-message hidden" role="alert"></p><button class="primary" type="submit">Reset Password</button></form></dialog>
+<dialog id="adminVerifyDialog" aria-labelledby="verifyTitle"><h3 id="verifyTitle">Verify Administrator Email</h3><p>Confirm the email address to activate your Super Administrator account.</p><input type="hidden" id="verifyEmailToken"><p id="verifyEmailError" class="error-message hidden" role="alert"></p><button class="primary" id="verifyEmailButton" type="button">Verify Email</button></dialog>
+<script src="/app.js" defer></script>
+</body>
+</html>

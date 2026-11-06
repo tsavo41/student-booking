@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: attachflow
+    runtime: node
+    plan: starter
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/hospitals
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: ATTACHFLOW_DB
+        value: /var/data/attachflow.sqlite
+    disk:
+      name: attachflow-data
+      mountPath: /var/data
+      sizeGB: 1
